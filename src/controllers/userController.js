@@ -16,20 +16,20 @@ exports.registerUser = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-      // Validate user credentials
-      const { email, password } = req.body;
-      console.log(req.Body);
-      const user = await User.findOne({ email });
-      if (!user || user.password !== password) {
-          return res.status(401).json({ message: 'Invalid email or password' });
-      }
-  
-      // Generate JWT token
-      const token = jwt.sign({ userId: user.user_id }, jwtSecretKey, { expiresIn: '24h' });
-      res.json({ token });
-      } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
-      }
+    // Validate user credentials
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email: email } }); // Specify where clause properly
+
+    if (!user || user.password !== password) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user.user_id }, jwtSecretKey, { expiresIn: '24h' });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 exports.getUserData = async (req, res) => {
